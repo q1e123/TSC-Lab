@@ -1,0 +1,32 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/UserData/z004m7ws/Workshop/Test-TESC/Proj/lab2/test
+vtest
+!s110 1678184145
+!i10b 1
+!s100 ZObh@Xc8TVS[ETnRI:z9`2
+IML66E9hVn>:jb6FSI<3X12
+VDg1SIo80bB@j0V0VzS_@n1
+R0
+w1614777644
+8D:/UserData/z004m7ws/Workshop/Test-TESC/Proj/lab2/test/test.v
+FD:/UserData/z004m7ws/Workshop/Test-TESC/Proj/lab2/test/test.v
+L0 7
+OW;L;10.5c;63
+r1
+!s85 0
+31
+!s108 1678184145.000000
+!s107 D:/UserData/z004m7ws/Workshop/Test-TESC/Proj/lab2/test/test.v|
+!s90 -reportprogress|300|-work|work|D:/UserData/z004m7ws/Workshop/Test-TESC/Proj/lab2/test/test.v|
+!s101 -O0
+!i113 1
+o-work work -O0
+tCvgOpt 0
