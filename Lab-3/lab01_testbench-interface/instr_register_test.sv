@@ -22,6 +22,9 @@ module instr_register_test
 
   int seed = 555;
 
+  int number_of_transactions = $unsigned($random)%16;
+  // int number_of_transactions =11;
+  int STACK_SIZE = 32;
   initial begin
     $display("\n\n***********************************************************");
     $display(    "***  THIS IS NOT A SELF-CHECKING TESTBENCH (YET).  YOU  ***");
@@ -36,10 +39,11 @@ module instr_register_test
     reset_n       <= 1'b0;          // assert reset_n (active low)
     repeat (2) @(posedge clk) ;     // hold in reset for 2 clock cycles
     reset_n        = 1'b1;          // deassert reset_n (active low)
-
+    
+  $display("\nNumber of transactions = %d\n", number_of_transactions);
     $display("\nWriting values to register stack...");
     @(posedge clk) load_en = 1'b1;  // enable writing to register
-    repeat (3) begin
+    repeat (number_of_transactions) begin
       @(posedge clk) randomize_transaction;
       @(negedge clk) print_transaction;
     end
@@ -51,7 +55,7 @@ module instr_register_test
       // later labs will replace this loop with iterating through a
       // scoreboard to determine which addresses were written and
       // the expected values to be read back
-      @(posedge clk) read_pointer = i;
+      @(posedge clk) read_pointer = $unsigned($random)%STACK_SIZE;
       @(negedge clk) print_results;
     end
 
@@ -76,7 +80,7 @@ module instr_register_test
     operand_a     <= $random(seed)%16;                 // between -15 and 15
     operand_b     <= $unsigned($random)%16;            // between 0 and 15
     opcode        <= opcode_t'($unsigned($random)%8);  // between 0 and 7, cast to opcode_t type
-    write_pointer <= temp++;
+    write_pointer <= $unsigned($random)%STACK_SIZE;
   endfunction: randomize_transaction
 
   function void print_transaction;
