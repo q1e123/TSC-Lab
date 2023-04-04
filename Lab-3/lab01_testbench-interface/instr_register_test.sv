@@ -4,9 +4,9 @@
  * with constrained random test generation, functional coverage, and
  * a scoreboard for self-verification.
  **********************************************************************/
+import instr_register_pkg::*;  // user-defined types are defined in instr_register_pkg.sv
 
-module instr_register_test
-  import instr_register_pkg::*;  // user-defined types are defined in instr_register_pkg.sv
+module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS = 5)
   (input  logic          clk,
    output logic          load_en,
    output logic          reset_n,
@@ -22,7 +22,7 @@ module instr_register_test
 
   int seed = 555;
 
-  int number_of_transactions = $unsigned($random)%16;
+  //int number_of_transactions = $unsigned($random)%16;
   // int number_of_transactions =11;
   int STACK_SIZE = 32;
   initial begin
@@ -31,6 +31,13 @@ module instr_register_test
     $display(    "***  NEED TO VISUALLY VERIFY THAT THE OUTPUT VALUES     ***");
     $display(    "***  MATCH THE INPUT VALUES FOR EACH REGISTER LOCATION  ***");
     $display(    "***********************************************************");
+    case (ADDRESS_MODE)
+        0: $display("\nADDRESS MODE: Both incremental"); 
+        1: $display("\nADDRESS MODE: Write incremental; Read random");
+        2: $display("\nADDRESS MODE: Write random; Read incremental");
+        3: $display("\nADDRESS MODE: Both random");
+        default: $display("\nERROR: INVALID ADDRESS MODE!");  
+    endcase;
 
     $display("\nReseting the instruction register...");
     write_pointer  = 5'h00;         // initialize write pointer
@@ -40,11 +47,22 @@ module instr_register_test
     repeat (2) @(posedge clk) ;     // hold in reset for 2 clock cycles
     reset_n        = 1'b1;          // deassert reset_n (active low)
     
-  $display("\nNumber of transactions = %d\n", number_of_transactions);
+  $display("\nNumber of transactions = %d\n", NUMBER_OF_TRANSACTIONS);
     $display("\nWriting values to register stack...");
     @(posedge clk) load_en = 1'b1;  // enable writing to register
-    repeat (number_of_transactions) begin
-      @(posedge clk) randomize_transaction;
+    repeat (NUMBER_OF_TRANSACTIONS) begin
+      case (ADDRESS_MODE)
+        0,1: @(posedge clk) begin
+              randomize_transaction;
+              write_pointer <= write_pointer + 1;
+            end 
+        2,3 :  @(posedge clk) begin
+              randomize_transaction;
+              write_pointer <= $unsigned($random)%STACK_SIZE;;
+            end 
+        default:
+              $display("\nERROR: INVALID ADDRESS MODE!");
+      endcase;
       @(negedge clk) print_transaction;
     end
     @(posedge clk) load_en = 1'b0;  // turn-off writing to register
@@ -55,7 +73,18 @@ module instr_register_test
       // later labs will replace this loop with iterating through a
       // scoreboard to determine which addresses were written and
       // the expected values to be read back
-      @(posedge clk) read_pointer = $unsigned($random)%STACK_SIZE;
+      case (ADDRESS_MODE)
+        0,2: @(posedge clk) begin
+              randomize_transaction;
+              read_pointer <= read_pointer + 1;
+            end 
+        1,3 :  @(posedge clk) begin
+              randomize_transaction;
+              read_pointer = $unsigned($random)%STACK_SIZE;
+            end 
+        default:
+              $display("\nERROR: INVALID ADDRESS MODE!");
+      endcase;
       @(negedge clk) print_results;
     end
 
