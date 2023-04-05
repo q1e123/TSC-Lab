@@ -1,8 +1,10 @@
 /***********************************************************************
  * A SystemVerilog top-level netlist to connect testbench to DUT
  **********************************************************************/
-`define ADDRESS_MODE 0
+`define ADDRESS_MODE 3
 `define NUMBER_OF_TRANSACTIONS 11
+`define SEED 11
+
 module top;
   timeunit 1ns/1ns;
 
@@ -22,7 +24,7 @@ module top;
   instruction_t  instruction_word;
 
   // instantiate testbench and connect ports
-  instr_register_test #(`ADDRESS_MODE, `NUMBER_OF_TRANSACTIONS) test (
+  instr_register_test #(`ADDRESS_MODE, `NUMBER_OF_TRANSACTIONS, `SEED) test (
     .clk(test_clk),
     .load_en(load_en),
     .reset_n(reset_n),

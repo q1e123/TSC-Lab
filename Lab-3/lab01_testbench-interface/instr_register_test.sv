@@ -6,7 +6,7 @@
  **********************************************************************/
 import instr_register_pkg::*;  // user-defined types are defined in instr_register_pkg.sv
 
-module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS = 5)
+module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS = 5, SEED = 555)
   (input  logic          clk,
    output logic          load_en,
    output logic          reset_n,
@@ -19,8 +19,6 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
   );
 
   timeunit 1ns/1ns;
-
-  int seed = 555;
 
   //int number_of_transactions = $unsigned($random)%16;
   // int number_of_transactions =11;
@@ -106,7 +104,7 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
     // write_pointer values in a later lab
     //
     static int temp = 0;
-    operand_a     <= $random(seed)%16;                 // between -15 and 15
+    operand_a     <= $random(SEED)%16;                 // between -15 and 15
     operand_b     <= $unsigned($random)%16;            // between 0 and 15
     opcode        <= opcode_t'($unsigned($random)%8);  // between 0 and 7, cast to opcode_t type
     write_pointer <= $unsigned($random)%STACK_SIZE;
