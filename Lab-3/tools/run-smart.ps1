@@ -5,3 +5,5 @@ for (($address_mode = 0); $address_mode -lt 5; $address_mode++)
     echo "Running test $address_mode having $transactions transactions with seed $seed"
     ./run_test.bat $address_mode $transactions $seed "c" > output-$address_mode.txt
 }
+echo "Passed tests: " (gc test.csv | select-string -pattern "PASS").length
+echo "Failed tests: " (gc test.csv | select-string -pattern "FAIL").length

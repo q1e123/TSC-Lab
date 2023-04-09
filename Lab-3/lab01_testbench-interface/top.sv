@@ -2,8 +2,9 @@
  * A SystemVerilog top-level netlist to connect testbench to DUT
  **********************************************************************/
 `define ADDRESS_MODE 3
-`define NUMBER_OF_TRANSACTIONS 11
+`define NUMBER_OF_TRANSACTIONS 20
 `define SEED 11
+`define TEST_FILE "D:\\UserData\\z004m7ws\\Workshop\\Test-TESC\\Proj\\TSC-Lab\\Lab-3\\tools\\test.csv"
 
 module top;
   timeunit 1ns/1ns;
@@ -23,9 +24,10 @@ module top;
   address_t      write_pointer, read_pointer;
   instruction_t  instruction_word;
 
+  transaction_test test_interface ();
   // instantiate testbench and connect ports
   instr_register_test #(`ADDRESS_MODE, `NUMBER_OF_TRANSACTIONS, `SEED) test (
-    .clk(test_clk),
+    .clk(clk),
     .load_en(load_en),
     .reset_n(reset_n),
     .operand_a(operand_a),
@@ -33,7 +35,8 @@ module top;
     .opcode(opcode),
     .write_pointer(write_pointer),
     .read_pointer(read_pointer),
-    .instruction_word(instruction_word)
+    .instruction_word(instruction_word),
+    .test_interface(test_interface)
    );
 
   // instantiate design and connect ports
@@ -47,6 +50,10 @@ module top;
     .write_pointer(write_pointer),
     .read_pointer(read_pointer),
     .instruction_word(instruction_word)
+   );
+  tester #(`TEST_FILE) tester (
+    .clk(clk),
+    .test_interface(test_interface)
    );
 
   // clock oscillators

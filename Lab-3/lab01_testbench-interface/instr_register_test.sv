@@ -15,7 +15,8 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
    output opcode_t       opcode,
    output address_t      write_pointer,
    output address_t      read_pointer,
-   input  instruction_t  instruction_word
+   input  instruction_t  instruction_word,
+   transaction_test  test_interface
   );
 
   timeunit 1ns/1ns;
@@ -24,6 +25,7 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
   // int number_of_transactions =11;
   int STACK_SIZE = 32;
   initial begin
+    $srandom(SEED);
     $display("\n\n***********************************************************");
     $display(    "***  THIS IS NOT A SELF-CHECKING TESTBENCH (YET).  YOU  ***");
     $display(    "***  NEED TO VISUALLY VERIFY THAT THE OUTPUT VALUES     ***");
@@ -61,7 +63,9 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
         default:
               $display("\nERROR: INVALID ADDRESS MODE!");
       endcase;
-      @(negedge clk) print_transaction;
+      @(negedge clk) begin
+        print_results;
+    end
     end
     @(posedge clk) load_en = 1'b0;  // turn-off writing to register
 
@@ -83,7 +87,9 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
         default:
               $display("\nERROR: INVALID ADDRESS MODE!");
       endcase;
-      @(negedge clk) print_results;
+      @(negedge clk) begin
+        print_results;  
+      end
     end
 
     @(posedge clk) ;
@@ -104,9 +110,9 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
     // write_pointer values in a later lab
     //
     static int temp = 0;
-    operand_a     <= $random(SEED)%16;                 // between -15 and 15
+    operand_a     <= $random % 16;                 // between -15 and 15
     operand_b     <= $unsigned($random)%16;            // between 0 and 15
-    opcode        <= opcode_t'($unsigned($random)%8);  // between 0 and 7, cast to opcode_t type
+    opcode        <= opcode_t'($unsigned($random)%7 + 1);  // between 0 and 7, cast to opcode_t type
     write_pointer <= $unsigned($random)%STACK_SIZE;
   endfunction: randomize_transaction
 
@@ -123,6 +129,9 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
     $display("  operand_a = %0d",   instruction_word.op_a);
     $display("  operand_b = %0d\n", instruction_word.op_b);
     $display("  result = %0d\n", instruction_word.result);
+    
+    test_interface.valid <= 1;
+    test_interface.instruction_word <= instruction_word;
+    test_interface.valid <= 0;
   endfunction: print_results
-
 endmodule: instr_register_test
