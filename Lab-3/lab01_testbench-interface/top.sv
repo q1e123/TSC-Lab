@@ -4,7 +4,6 @@
 `define ADDRESS_MODE 3
 `define NUMBER_OF_TRANSACTIONS 20
 `define SEED 11
-`define TEST_FILE "D:\\UserData\\z004m7ws\\Workshop\\Test-TESC\\Proj\\TSC-Lab\\Lab-3\\tools\\test.csv"
 
 module top;
   timeunit 1ns/1ns;
