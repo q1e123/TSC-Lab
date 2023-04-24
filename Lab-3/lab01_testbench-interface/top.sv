@@ -4,7 +4,7 @@
 `define ADDRESS_MODE 3
 `define NUMBER_OF_TRANSACTIONS 20
 `define SEED 11
-
+`define TEST_FILE "test-results.csv"
 module top;
   timeunit 1ns/1ns;
 
@@ -25,7 +25,7 @@ module top;
 
   transaction_test test_interface ();
   // instantiate testbench and connect ports
-  instr_register_test #(`ADDRESS_MODE, `NUMBER_OF_TRANSACTIONS, `SEED) test (
+  instr_register_test #(`ADDRESS_MODE, `NUMBER_OF_TRANSACTIONS, `SEED, `TEST_FILE) test (
     .clk(clk),
     .load_en(load_en),
     .reset_n(reset_n),

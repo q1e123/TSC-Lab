@@ -6,7 +6,8 @@
  **********************************************************************/
 import instr_register_pkg::*;  // user-defined types are defined in instr_register_pkg.sv
 
-module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS = 5, SEED = 555)
+int wrong = 0;
+module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS = 5, SEED = 555, TEST_FILE="test-results.csv")
   (input  logic          clk,
    output logic          load_en,
    output logic          reset_n,
@@ -38,7 +39,6 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
         3: $display("\nADDRESS MODE: Both random");
         default: $display("\nERROR: INVALID ADDRESS MODE!");  
     endcase;
-
     $display("\nReseting the instruction register...");
     write_pointer  = 5'h00;         // initialize write pointer
     read_pointer   = 5'h1F;         // initialize read pointer
@@ -65,7 +65,8 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
       endcase;
       @(negedge clk) begin
         print_results;
-    end
+        check_result;
+      end
     end
     @(posedge clk) load_en = 1'b0;  // turn-off writing to register
 
@@ -134,4 +135,27 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
     test_interface.instruction_word <= instruction_word;
     test_interface.valid <= 0;
   endfunction: print_results
+
+
+  function void check_result;
+    Number_64 expected_result;
+    logic check_result;
+    int file_handle;
+   unique case (instruction_word.opc)
+        PASSA: expected_result = instruction_word.op_a;
+        PASSB: expected_result = instruction_word.op_b;
+        ADD: expected_result = instruction_word.op_a + instruction_word.op_b;
+        SUB: expected_result = instruction_word.op_a - instruction_word.op_b;
+        MULT: expected_result = instruction_word.op_a * instruction_word.op_b;
+        DIV: expected_result = instruction_word.op_a / instruction_word.op_b;
+        MOD: expected_result = instruction_word.op_a % instruction_word.op_b;
+        default: expected_result = 0;
+    endcase;
+    check_result = (instruction_word.result == expected_result);
+    if(check_result) begin
+      ++wrong;
+      $display("Tests failed: %0d\n", wrong);
+    end
+  endfunction: check_result
+
 endmodule: instr_register_test
