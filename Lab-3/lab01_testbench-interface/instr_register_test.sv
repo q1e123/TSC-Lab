@@ -157,5 +157,12 @@ module instr_register_test #(parameter ADDRESS_MODE = 0, NUMBER_OF_TRANSACTIONS 
       $display("Tests failed: %0d\n", wrong);
     end
   endfunction: check_result
-
+/*
+  covergroup cg @(posedge clk);
+    c1: coverpoint instruction_word.op_a;
+    c2: coverpoint instruction_word.op_b;
+    c3: coverpoint instruction_word.opc;
+  endgroup : cg
+  cg cover_inst = new();
+*/
 endmodule: instr_register_test
